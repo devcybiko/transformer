@@ -1,0 +1,18 @@
+{
+  "name": "transformer",
+  "version": "1.0.0",
+  "description": "",
+  "bin": {
+    "transformer": "./transformer.js"
+  },
+  "main": "transformer.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "glstools": "^1.2.10",
+    "node-html-parser": "^2.0.0"
+  }
+}

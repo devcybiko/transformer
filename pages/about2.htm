@@ -1,0 +1,41 @@
+
+#include "ie9shim.htm"
+#include "stylesheets.htm"
+#include "head.htm"
+#include "navigation.htm"
+#include "header.htm"
+#include "inner_banner.htm"
+#include "banner_section.htm"
+#include "team_section.htm"
+#include "skills_section.htm"
+#include "fact_section.htm"
+#include "client_section.htm"
+#include "footer_widget.htm"
+#include "footer_contacts.htm"
+#include "social_footer.htm"
+#include "search.htm"
+#include "body.htm"
+#include "html.htm"
+
+$html
+$head(_title)
+$ie9shim
+$stylesheets
+$head_end
+$body
+$header(_title)
+$navigation
+$header_end
+$inner_banner
+$banner_section
+$team_section
+$skills_section
+$fact_section
+$client_section
+$footer_contacts
+$footer_widget(_col,_title,_text)
+$footer_contacts_end
+$social_footer
+$search
+$body_end
+$html_end
