@@ -5,10 +5,11 @@ const glstools = require('glstools');
 const gfiles = glstools.files;
 
 let page = "\n";
-let includes = `\n`;
+let includes = `#include <_defines.htm>\n`;
 let override;
 
 function getMacroDefinition(node) {
+    if (!node) return null;
     for (let c of node.classNames || []) {
         if (c[0] === '$') return c;
     }
@@ -70,37 +71,46 @@ function macroFname(node) {
     return macro.replace("$", "") + ".htm";
 }
 
-function generateFrags(node, parentMacro) {
-    let define = getMacroDefinition(node);
-
-    if (define) {
-        page += define + "\n";
-    }
+function generateFrags(node, parentNode) {
+    let nodeMacro = getMacroDefinition(node);
+    let parentMacro = getMacroDefinition(parentNode);
     let endNode;
-    for (let child of node.childNodes) {
-        let macro = getMacroDefinition(child);
-        generateFrags(child, macro || parentMacro);
-        if (macro) {
+
+    if (nodeMacro) page += nodeMacro + "\n";
+
+    if (false && isDummyMacro(nodeMacro) && parentMacro) {
+        let endNodeString = `<div class="#enddefine ${parentMacro} ${nodeMacro}"></div>`;
+        endNode = parse(endNodeString);
+        parentNode.exchangeChild(node, endNode);
+        return;
+    }
+    for (let childNode of node.childNodes) {
+        if (isIgnored(childNode)) {
+            node.removeChild(childNode);
+            continue;
+        }
+        let childMacro = getMacroDefinition(childNode);
+        generateFrags(childNode, childMacro ? childNode : parentNode);
+        if (childMacro) {
             if (!endNode && parentMacro) {
-                let endNodeString = `<div class="#enddefine ${parentMacro} ${macro}"></div>`;
+                let endNodeString = `<div class="#enddefine ${parentMacro} ${childMacro}"></div>`;
                 endNode = parse(endNodeString);
-                node.exchangeChild(child, endNode);
+                node.exchangeChild(childNode, endNode);
             } else {
-                node.removeChild(child);
+                node.removeChild(childNode);
             }
         }
-        if (isIgnored(child)) {
-            node.removeChild(child);
-        }
     }
-    if (define) {
+    if (nodeMacro) {
         includes += `#include <${macroFname(node)}>\n`;
         let endname = dumpMacro(node);
-        if (endname) {
-            page += endname + "\n";
-        }
+        if (endname) page += endname + "\n";
     }
     return;
+}
+
+function isDummyMacro(define) {
+    return define === "$dummy";
 }
 
 function main() {
