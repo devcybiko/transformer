@@ -9,31 +9,27 @@ let includes = `#include <_defines.htm>\n`;
 let override;
 
 function getMacroDefinition(node) {
-    if (!node) return null;
-    for (let c of node.classNames || []) {
-        if (c[0] === '$') return c;
-    }
-    return null;
+    return node && node.getAttribute && node.getAttribute("define");
 }
 
 function isIgnored(node) {
-    for (let c of node.classNames || []) {
-        if (c === '#ignore') return c;
-    }
-    return null;
+    return node && node.getAttribute && node.getAttribute("define") === "$ignore";
+}
+
+function isDummyMacro(define) {
+    return define === "$dummy";
 }
 
 function dumpMacro(node) {
     let endname;
     let define = getMacroDefinition(node);
     let macro = macroName(node).replace("$", "");
-    let output = `#define ${define} \\\n<!-- begin ${macro} -->`;
+    let output = `#define ${define} `;
     let lines = node.toString().split("\n");
     for (let line of lines) {
         line = line.trim();
         if (!endname && line.includes("#enddefine")) {
             endname = define.split("(")[0] + "_end";
-            output += ` \\\n<!-- end ${macro} -->`;
             output += "\n\n";
             output += `#define ${endname}`;
             continue;
@@ -109,9 +105,6 @@ function generateFrags(node, parentNode) {
     return;
 }
 
-function isDummyMacro(define) {
-    return define === "$dummy";
-}
 
 function main() {
     let infname = process.argv[2];
